@@ -1,0 +1,84 @@
+.comment {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.box {
+  flex: 1;
+}
+
+.content {
+  background: var(--gray-700);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.authorAndTime {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorInfo strong {
+  line-height: 1.6;
+  color: var(--gray-100);
+}
+
+.authorInfo time {
+  line-height: 1.6;
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+
+.buttonTrash {
+  background: transparent;
+  color: var(--gray-400);
+  border: 0;
+  border-radius: 2px;
+  line-height: 0;
+}
+
+.buttonTrash:hover {
+  color: var(--red-500);
+  cursor: pointer;
+}
+
+.contentComment {
+  margin-top: 1rem;
+  color: var(--gray-300);
+}
+
+.box footer {
+  margin-top: 1rem;
+}
+
+.buttonThumbsUp {
+  display: flex;
+  align-items: center;
+  border: 0;
+  border-radius: 2px;
+  line-height: 0;
+  background: transparent;
+  color: var(--gray-400);
+}
+
+.buttonThumbsUp svg {
+  margin-right: 0.5rem;
+}
+
+.buttonThumbsUp:hover {
+  color: var(--green-300);
+  cursor: pointer;
+}
+
+.buttonThumbsUp span::before {
+  content: "\2022";
+  padding: 0 0.25rem;
+}
