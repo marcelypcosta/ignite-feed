@@ -15,6 +15,7 @@ import {
   type ChangeEvent,
   type FormEvent,
   type InvalidEvent,
+  useEffect,
 } from "react";
 
 // Interface das props
@@ -30,6 +31,11 @@ interface IContent {
   content: string;
 }
 
+interface ICommentItem {
+  content: string;
+  createdAt: string;
+}
+
 export interface IPost {
   id: number;
   author: IAuthor;
@@ -43,8 +49,33 @@ interface IPostProps {
 
 export function Post({ post }: IPostProps) {
   // States
-  const [comment, setComment] = useState<string[]>([]);
+  const storageKey = `ignite-feed:post:${post.id}:comments`;
+  const [comment, setComment] = useState<ICommentItem[]>(() => {
+    try {
+      const stored = localStorage.getItem(storageKey);
+      const parsed = stored ? JSON.parse(stored) : [];
+      const normalized: ICommentItem[] = Array.isArray(parsed)
+        ? parsed.map((x: any) =>
+            typeof x === "string"
+              ? { content: x, createdAt: new Date().toISOString() }
+              : x
+          )
+        : [];
+      return normalized;
+    } catch {
+      return [];
+    }
+  });
   const [newCommentChange, setNewCommentChange] = useState("");
+
+  // Persistir comentários no localStorage sempre que mudarem
+  useEffect(() => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(comment));
+    } catch {
+      // noop
+    }
+  }, [comment, storageKey]);
 
   // Formatting date published
   const publishedDateFormatted = format(
@@ -64,8 +95,9 @@ export function Post({ post }: IPostProps) {
   function handleCreateNewComment(event: FormEvent) {
     event.preventDefault();
 
-    // Add os novos comentários a lista
-    setComment([...comment, newCommentChange]);
+    // Add os novos comentários a lista com timestamp
+    const newItem: ICommentItem = { content: newCommentChange, createdAt: new Date().toISOString() };
+    setComment([...comment, newItem]);
     // Limpar o input
     setNewCommentChange("");
   }
@@ -83,8 +115,8 @@ export function Post({ post }: IPostProps) {
 
   function deleteComment(commentToDelete: string) {
     // Filtra os comentários, retornando apenas os que são diferentes do comentário a ser deletado
-    const updateCommentList = comment.filter((comment) => {
-      return comment !== commentToDelete;
+    const updateCommentList = comment.filter((item) => {
+      return item.content !== commentToDelete;
     });
 
     // Atualiza o estado com a nova lista de comentários
@@ -146,12 +178,15 @@ export function Post({ post }: IPostProps) {
       </form>
 
       <div className={styles.commentList}>
-        {comment.map((comment) => {
+        {comment.map((item, index) => {
+          const createdAtDate = new Date(item.createdAt);
           return (
             <Comment
-              key={comment}
-              content={comment}
+              key={`${item.content}-${index}-${item.createdAt}`}
+              content={item.content}
               onDeleteComment={deleteComment}
+              authorName={post.author.name}
+              createdAt={createdAtDate}
             />
           );
         })}

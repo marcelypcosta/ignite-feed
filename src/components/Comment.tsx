@@ -1,5 +1,7 @@
 // Libs
 import { Trash, ThumbsUp } from "@phosphor-icons/react";
+import { format, formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale/pt-BR";
 
 // Components
 import { Avatar } from "./Avatar";
@@ -13,9 +15,11 @@ import { useState } from "react";
 interface IComment {
   content: string;
   onDeleteComment: (comment: string) => void;
+  authorName: string;
+  createdAt?: Date;
 }
 
-export function Comment({ content, onDeleteComment }: IComment) {
+export function Comment({ content, onDeleteComment, authorName, createdAt }: IComment) {
   const [likeCount, setLikeCount] = useState(0);
 
   function handleDeleteComment() {
@@ -32,19 +36,34 @@ export function Comment({ content, onDeleteComment }: IComment) {
     });
   }
 
+  // Formatting date published
+  const baseDate = createdAt ?? new Date();
+  const publishedDateFormatted = format(
+    baseDate,
+    "dd 'de' MMM 'ás' HH:mm'h'",
+    {
+      locale: ptBR,
+    }
+  );
+
+  const publishedDateRelativeToNow = formatDistanceToNow(baseDate, {
+    locale: ptBR,
+    addSuffix: true,
+  });
+
   return (
     <div className={styles.comment}>
-      <Avatar src={"https://github.com/diego3g.png"}/>
+      <Avatar src={"https://github.com/marcelypcosta.png"} />
       <div className={styles.box}>
         <div className={styles.content}>
           <header className={styles.authorAndTime}>
             <div className={styles.authorInfo}>
-              <strong>Diego Fernandes</strong>
+              <strong>{authorName}</strong>
               <time
-                title="14 de Outubro ás 15h15"
-                dateTime="2024-10-14 15:15:30"
+                title={publishedDateFormatted}
+                dateTime={baseDate.toISOString()}
               >
-                Cerca de 1h atrás
+                {publishedDateRelativeToNow}
               </time>
             </div>
             <button
